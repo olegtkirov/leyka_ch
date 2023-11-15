@@ -1,0 +1,15 @@
+div#message p { font-weight: bold; }
+2div#wpbody { width: 90%; margin: 0 auto; margin-top: 12px; padding: 16px; background: #fff; border: 3px double white; border-radius: 16px; }
+div#wpbody h3 { margin: 2px; margin-top: 14px; }
+div#wpbody label.labb { color: navy; margin: 2px; display: inline; }
+div#wpbody div.chb { width: 40%; padding: 0px 5px; margin-bottom: 3px; background-color:#fff; }
+div#wpbody input[type=checkbox], div#wpbody select { margin-left: 3%; }
+div#wpbody input#btnSubmit { font-size: 18px; padding: 6px; margin: 8px; border: 1px solid silver; border-radius: 6px; background: #fff; }
+div#wpbody input#btnSubmit:hover { background: #2271B1; color: white; cursor: pointer;
+ -webkit-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.4);
+ -moz-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.4);
+ box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.4);
+}
+div#report {
+ width: 40%; padding: 12px; margin-left:5%; font-size: 1.2em; background-color:#fff;
+}
