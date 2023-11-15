@@ -99,7 +99,7 @@ class Leyka_CH {
 			$camp_post_meta = get_post_meta($postt->ID, '', true);
 //echo "<pre>"; print_r(get_post_meta($postt->ID, '')); echo "</pre>";
 			$finished = get_post_meta($postt->ID, 'is_finished', true);
-		echo "<div class='chb'>$finished<input type='checkbox' name='ch_act[ch_close][".$postt->ID."]' id='cl_".$postt->ID."' class='ch_close' value='".$postt->ID."' /> \n";
+		echo "<div class='chb'><input type='checkbox' name='ch_act[ch_close][".$postt->ID."]' id='cl_".$postt->ID."' class='ch_close' value='".$postt->ID."' /> \n";
 		echo "<label class='labb' for='cl_".$postt->ID."'{$postt->ID}'>{$postt->ID}. ".$postt->post_title." /".get_the_date('m-d-Y', $postt->ID)."/</label></div>\n";
 		}
 	?>
