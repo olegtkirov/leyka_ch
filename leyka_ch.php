@@ -99,7 +99,7 @@ class Leyka_CH {
 			$camp_post_meta = get_post_meta($postt->ID, '', true);
 //echo "<pre>"; print_r(get_post_meta($postt->ID, '')); echo "</pre>";
 			$finished = get_post_meta($postt->ID, 'is_finished', true);
-		echo "<div class='chb'><input type='checkbox' name='ch_act[ch_close][".$postt->ID."]' id='cl_".$postt->ID."' class='ch_close' value='".$postt->ID."' /> \n";
+		echo "<div class='chb'>$finished<input type='checkbox' name='ch_act[ch_close][".$postt->ID."]' id='cl_".$postt->ID."' class='ch_close' value='".$postt->ID."' /> \n";
 		echo "<label class='labb' for='cl_".$postt->ID."'{$postt->ID}'>{$postt->ID}. ".$postt->post_title." /".get_the_date('m-d-Y', $postt->ID)."/</label></div>\n";
 		}
 	?>
@@ -107,28 +107,17 @@ class Leyka_CH {
 		<h3>Активные кампании</h3>
 		<i>Выберите кампанию на которую хотете перенаправить подписки с закрытой</i>
 		<br />
-<?php
-//$campaign = new Leyka_Campaign(26099);
-//echo "<pre>"; print_r($campaign); echo "</pre>";
-?>
+
 		<select name="ch_act[activ_campaning]" id="activ_campaning" required>
 		<option value="">--== Выберите кампанию ==--
 		<?php
-		$list_post_campaing_donate = $this->lpay_get_posts_list($this->lpay_post_type_donate);
-		foreach ($list_post_campaing_donate as $postt) {
+		$list_activ_campaing = $this->activ_get_posts_list($this->lpay_post_type_campaign);
+		foreach ($list_activ_campaing as $postt) {
 			//$camp_post_meta = get_post_meta($postt->ID, '', true);
 			//$pid = $camp_post_meta['leyka_campaign_id'][0];
 			$pid = $postt->ID;
-//echo "<pre>"; print_r($postt); echo "</pre>";
-//echo "<pre>"; print_r(get_post_meta($postt->ID, '')); echo "</pre>";
-/*    [leyka_campaign_id] => Array
-        (
-            [0] => 748
-        )
-*/
 			echo "<option value=\"$pid\">$pid. {$postt->post_title} /".get_the_date('m-d-Y', $postt->ID)."/</option>\n";
-//"
-		}
+}
 		?>
 		</select>
 		<br /><br />
@@ -139,23 +128,18 @@ class Leyka_CH {
 
 	<?php
 	}
-
 /********************************************************
 	Get meta date
 /********************************************************/
+//Закрытые кампании с активными подписками
 	function lpay_get_posts_list($post_types='post') {
 		if ($this->error ==2 ) { echo "Error"; return; } // Not Leyka
-//$post_types = 'post';
-//echo "post_types-$post_types<br />";
 		if (!post_type_exists($post_types) ){
 			$this->error_type = '<div id="message" class="error fade">Не верный тип поста '.$post_types.'</div>';
 			return;
 		}
-
 		global $wpdb;
 	if ($post_types == 'leyka_campaign') {
-//		$sql = "SELECT SQL_CALC_FOUND_ROWS ID, post_title, post_date, post_parent, post_type, meta_key, meta_value
-//		 AND ( ($wpdb->postmeta.meta_key != 'is_finished') AND ($wpdb->postmeta.meta_value = '1')
 		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM $wpdb->posts
 		 LEFT JOIN $wpdb->postmeta ON ( $wpdb->posts.ID = $wpdb->postmeta.post_id )
 		 WHERE ( ($wpdb->postmeta.meta_key = 'is_finished') AND ($wpdb->postmeta.meta_value = '1')
@@ -166,8 +150,6 @@ class Leyka_CH {
 		$res = $wpdb->get_results($sql);
 	}
 	if ($post_types == 'leyka_donation') {
-//		$post_types = 'post';
-//		$sql = "SELECT SQL_CALC_FOUND_ROWS ID, post_title, post_date, post_parent, post_type, meta_key, meta_value
 		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM $wpdb->posts
 		 LEFT JOIN $wpdb->postmeta ON ( $wpdb->posts.ID = $wpdb->postmeta.post_id )
 		 WHERE (
@@ -176,28 +158,42 @@ class Leyka_CH {
 		 AND ( $wpdb->posts.post_password = '' AND $wpdb->posts.post_status != 'failed')
 		 )
 		 GROUP BY $wpdb->posts.ID ORDER BY $wpdb->posts.post_date DESC";
-//echo $sql;
 		$args = array(
 			'post_type' => $post_types, 'posts_per_page' => 5, 'post_status' => 'publish', 'cache_results' => false, 'update_post_term_cache' => false, 
 			'meta_query' => array(
 			      array(
 				'key' => 'leyka_campaing_id',
-//				'key' => '',
-//				'type'    => 'numeric',
 				'value' => '',
 				'meta_value_num' => '0',
 				'compare' => '>=',
 			      )
 			   )
 		);
-//		$res = new WP_Query($args->posts);
 		$res = $wpdb->get_results($sql);
 	}
-//$res = $wpdb->get_results($wpdb->prepare( "SELECT DISTINCT meta_value FROM $wpdb->postmeta WHERE meta_key = %s", $meta_key) , ARRAY_N  );
-//		$res = $wpdb->get_results("SELECT ID, post_title, post_date, guid FROM $wpdb->posts WHERE ".$where." LIMIT 5");
-//echo "<pre>"; print_r($res); echo "</pre>";
 		wp_reset_postdata();
 		return($res);
+	}
+// Активные кампании
+	function activ_get_posts_list($post_types='post') {
+		if ($this->error ==2 ) { echo "Error"; return; } // Not Leyka
+		if (!post_type_exists($post_types) ){
+			$this->error_type = '<div id="message" class="error fade">Не верный тип поста '.$post_types.'</div>';
+			return;
+		}
+		global $wpdb;
+	if ($post_types == 'leyka_campaign') {
+		$asql = "SELECT SQL_CALC_FOUND_ROWS * FROM $wpdb->posts
+		 LEFT JOIN $wpdb->postmeta ON ( $wpdb->posts.ID = $wpdb->postmeta.post_id )
+		 WHERE ( ($wpdb->postmeta.meta_key = 'is_finished') AND ($wpdb->postmeta.meta_value = '0')
+		 AND ($wpdb->posts.post_type = '$post_types') AND ($wpdb->posts.post_parent = '0')
+		 AND ($wpdb->posts.post_status = 'publish') AND ($wpdb->posts.post_password = '')
+		 )
+		 GROUP BY $wpdb->posts.post_date ORDER BY $wpdb->posts.post_date DESC LIMIT 0, 700";
+		$ares = $wpdb->get_results($asql);
+	}
+		wp_reset_postdata();
+		return($ares);
 	}
 
 /********************************************************
